@@ -1,5 +1,7 @@
 # EE282 Bioinformatics Project Analysis Proposal
 
+## Author: Bobby Sims
+
 ## Introduction
 
 The role of T regulatory cells (Tregs) in auto immune neuro inflammatory diseases is unique and complex. The pathogenesis of MS for example, is characterized by their initial failure of Tregs in distinguishing self from non-self antigens, leading to immune reactivity to myelin, the structural component of neuron sheaths that facilitate neuron signal conduction. Yet paradoxically upon onset of auto immune neuroinflammation, it is the performance of Tregs that determines outcomes of the disease, as their multipronged immune suppressive capacities are essential to recovery and remission. The gatekeepers of immune tolerance can remediate their own initial failure. 
@@ -13,7 +15,7 @@ PMID: [35579560](https://pubmed.ncbi.nlm.nih.gov/35579560/)
 
 I will download software packages required for R analysis of microarray data from Affymetrix gene chip including “GEOquery” and “Affy”, from Bioconductor. 
 Data “cleaning” includes unpacking .tar files into .CEL format and data normalization using RMA method. 
- I will analyze genes differentially expressed between wild type and EAE Tregs in CNS tissues (brain and spinal cord) and spleen tissue at the peak of disease in R using Deseq2. Variance between replicates will be shown on dispersion plot and I will analyze the top 10 and top 5 DEGs using volcano plot and PCA. Graphical visualizations of analyses are performed using ggplot2 package in R.  
+ I will analyze genes differentially expressed between wild type and EAE Tregs in CNS tissues (brain and spinal cord) and spleen tissue at the peak of disease in R using Deseq2/ limma. Variance between replicates will be shown on dispersion plot and I will analyze the top 10 and top 5 DEGs using volcano plot and PCA. Graphical visualizations of analyses are performed using ggplot2 package in R.  
 
 ## Rationale
 
