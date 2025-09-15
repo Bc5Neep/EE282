@@ -1,0 +1,447 @@
+
+## Calculate each of the following for sequences ≤ 100kb and < 100kb
+faFilter -maxSize=100000 ‘{print length($seq)}’ dmel-all-chromosome-r6.64.fasta /dev/stdout | faSize /dev/stdin
+
+faFilter -minSize=100000 ‘{print length($seq)}’ dmel-all-chromosome-r6.64.fasta /dev/stdout | faSize /dev/stdin
+
+##Histogram of sequence length distribution
+
+##Obtain sequence length distribution less than or equal to 100kb
+bioawk -c fastx  ‘length (seq) <= 100000  {print length($seq)} dmel-all-chromosome-r6.64.fasta > sequence_lengths100kb_and_below.txt 
+
+
+
+##Write script for gnuplot histogram parameters using vim 
+
+vim Seqlength100kb_and_below.sh
+
+#!/bin/bash
+gnuplot -persist << 'EOF'
+set title "Sequence Length Distribution (<=100kb)"
+set terminal pngcairo size 800, 600
+set output "seqlength 100kb or less.png"
+set xlabel "Sequence Lengths (bp,log scale)"
+set ylabel "Count"
+binwidth = 0.1
+bin(x) = binwidth *floor (x/binwidth)
+set style fill solid 0.6
+plot "sequence_lengths100kb_and_below.txt" using (bin(log10($1))):(1) smooth freq with boxes lc rgb "blue" notitle
+EOF
+
+##Make writeable
+chmod +x seqlength100kb_and_below.sh
+##Run
+./Seqlength100kb_and_below.sh
+
+##Greater Than 100kb
+bioawk -c fastx  ‘length (seq)  > 100000  ‘{print length($seq)} dmel-all-chromosome-r6.64.fasta > sequence_lengths100kb_and_above.txt
+
+vim Seqlength above100kb.sh
+#!/bin/bash
+gnuplot -persist << 'EOF'
+set title "Sequence Length Distribution (>100kb)"
+set terminal pngcairo size 800, 600
+set output "Seqlength_above100kb.png"
+set xlabel "Sequence Lengths (bp, log scale)"
+set ylabel "Count"
+binwidth = 0.1
+bin(x) = binwidth * floor(x/binwidth)
+set style fill solid 0.6
+plot "sequence_lengths100kb_and_above.txt" using (bin(log10($1))):(1) smooth freq with boxes lc rgb "blue" notitle
+EOF
+
+## Obtain %GC distribution of sequences ≤100kb 
+
+bioawk -c fastx ‘length ($seq)≤100000 {print(gc($seq))*100}’ dmel-all-chromosome-r6.64.fasta> seqGC_100kb_and_below.txt
+
+vim GC_Percent100kb_and_below.sh
+#!/bin/bash
+gnuplot -persist <<'EOF'
+set title "Percent GC Distribution (Per Sequence<=100kb)"
+set terminal pngcairo size 800, 600
+set output "GC content 100kb or less.png"
+set xlabel "Percent GC"
+set ylabel "Count"
+binwidth = 20
+set style fill solid 0.6
+bin(x) = binwidth *floor((x-1)/binwidth) +1
+plot "seqGC_100kb_and_below.txt" using (bin($1)):(1) smooth freq with boxes lc rgb "blue" notitle
+EOF
+~
+
+
+## GC% sequences above 100kb
+
+bioawk -c fastx ‘length ($seq)>100000 {print(gc($seq))*100}’ dmel-all-chromosome-r6.64.fasta> seqGC_100kb_and_above.txt
+
+vim GC_Percentabove100kb.sh
+#!/bin/bash
+gnuplot -persist <<'EOF'
+set title "Percent GC Distribution (Per Sequence>100kb)"
+set terminal pngcairo size 800, 600
+set output "GC content above 100kb.png"
+set xlabel "Percent GC"
+set ylabel "Count"
+binwidth = 20
+set style fill solid 0.6
+bin(x) = binwidth *floor((x-1)/binwidth) +1
+plot "seqGC_100kb_and_above.txt" using (bin($1)):(1) smooth freq with boxes lc rgb "blue" notitle
+EOF
+
+Chmod +x GC_Percentabove100kb.sh
+./GC_Percentabove100kb.sh
+
+##Obtain cumulative size from largest to smallest for sequences ≤ 100kb and >100kb respectively, and store each in renamed.txt file
+##Cumulative sequence size Less than 100kb
+awk '{ count[$1]++ ; total++;} END {cum = 0 ;for (len in count) {cum += count[len]; print len, cum/total;}}' cdf100kb_and_below.txt | sort -rn 
+
+vim Cdf_plot100kb_and_below.sh
+
+#!/bin/bash
+gnuplot -persist << 'EOF'
+set terminal pngcairo size 800,600
+set output "CDF100kb_or_Less.png"
+set title "CDF Sequence Lengths <=100kb" 
+set xlabel "Sequence Length (bases)"
+set ylabel "Cumulative Fraction"
+set xrange [*:*] reverse
+set grid
+set style fill solid 0.8
+set key top left
+plot "cdf100kb_and_below.txt" using 1:2 with boxes lw 2 lc rgb "blue" title "CDF"
+EOF
+
+chmod +x Cdf_plot100kb_and_below.sh
+./Cdf_plot100kb_and_below.sh
+##Cumulative sequence size greater than 100kb
+awk '{ count[$1]++ ; total++;} END {cum = 0 ;for (len in count) {cum += count[len]; print len, cum/total;}}' cdf100kb_and_below.txt | sort -rn 
+vim Cdf_plot_above100kb.sh
+#!/bin/bash
+gnuplot -persist << 'EOF'
+set title "CDF Sequence Lengths > 100kb"
+set terminal pngcairo size 800,600 
+set xlabel "Sequences Length (bases)"
+set ylabel "Cumulative Fraction"
+set output "CDF100kb_and_Above.png"
+set xrange [*:*] reverse
+set grid
+set style fill solid 0.8
+plot "cdfdat100kb_more.txt" using 1:2 with boxes lw 2 lc rgb "blue" title "CDF"
+EOF
+Chmod +x Cdf_plot_above100kb.sh
+./Cdf_plot_above100kb
+
+## Obtain PacBio hifi D.melanogaster ISO1 genome sequence
+wget https://genomeark.s3.amazonaws.com/species/Drosophila_melanogaster/idDroMela1/genomic_data/pacbio_hifi/m64069_221101_123519.hifi_reads.fastq.gz
+##Perform md5sum
+md5sum m64069-221101_123519.hifi_reads.fastq.gz
+a7fe7514fb122bcdd3ca5204572c4be3 m64069_221101_123519.hifi_reads.fastq.gz
+
+## Rename for downstream applications (optional)
+
+mv m64096 221101 123519.hifi_reads.fastq.gz ISO1_hifi.fastq.gz
+
+## Remove possible adapter sequences using hifiadatperfilt
+
+install bioconda :: hifiadapterfilt
+
+## General formula for hifiadapterfilt commands
+-p=prefix of target file -l=min length of sequences to target for removal -t=threads -o= output directory and resulting filename
+## Create FASTA database file for commonly used PacBio Adapter sequences
+cat << 'EOF' > SMRTbell_adapters.fasta
+>SMRTbell_Adapter_1
+CTCACTCTCACACTACTCCAGTCGTCGCTCTATCTTCG
+>SMRTbell_Adapter_2
+CTCACTCTCACACTACTCCAGTCGTCGCTCTATCTTCGTAGACTTGGGGTAGCGGCCGCTCATAT
+EOF
+
+## Store in blastdb file
+makeblastdb -in SMRTbell_adapters.fasta -dbtype nucl -out adapters
+
+## Run hifiadapterfilt
+bash /data/homezvol1/rsims1/miniforge3/envs/ee282/bin/hifiadapterfilt.sh \
+  -p ISO1 \
+  -l 25 \
+  -m 98 \
+  -t 16 \
+  -o /tmp/rsims1/ISO1_filtered_L25
+
+## Preliminary Stats
+## Reads Before filtering
+zcat ISO1.fastq.gz | grep -c "^@" 1961704
+
+## Reads post filtering
+zcat ISO1.filt.fastq.gz | grep -c "^@" 1961704
+
+##Bases before filtering
+zcat ISO1.fastq.gz | awk 'NR % 4 == 2 {bases += length($0)} END {print bases}'
+22505423345
+
+##Bases post filtering
+zcat ISO1.filt.fastq.gz | awk 'NR % 4 == 2 {sum += length($0)} END {print sum}'
+22505423345
+
+## Run 10x coverage script
+
+vim ISO1_filt_10x.sh
+#!/bin/bash
+INPUT="ISO1.filt.fastq.gz"
+GENOME_SIZE=140000000  # ~140 Mb
+TARGET_COVERAGE=10
+BASES_TO_KEEP=$((GENOME_SIZE * TARGET_COVERAGE))
+TOTAL_BASES=$(zcat $INPUT | awk 'NR % 4 == 2 {sum += length($0)} END {print sum}')
+FRACTION=$(echo "$BASES_TO_KEEP / $TOTAL_BASES" | bc -l)
+seqtk sample -s100 $INPUT $FRACTION > ISO1.filt.10x.fastq
+EOF
+chmod +x ISO1_filt_10x.sh
+./ISO1_filt_10x.sh
+
+##Perform Assembly on filtered 10x ISO1 Genome Using hifiasm
+##Install hifiasm
+
+mamba install hifiasm
+##General Hifiasm format
+           hifiasm -o <output_prefix> -t <number_of_threads> <input_reads.fastq.gz>
+
+##Write hifiasm script in Vim 
+
+vim BS_hifiasm_job.slurm
+
+#!/bin/bash
+#SBATCH --job-name=ISO1_hifiasm
+#SBATCH --output=ISO1_hifiasm.%j.out
+#SBATCH --error=ISO1_hifiasm.%j.err
+#SBATCH --partition=standard
+#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=120G
+#SBATCH --ntasks=1
+Module purge
+module load hifiasm/0.21.0-r686
+
+cp /data/homezvol1/rsims1/ISO1.filt.10x.fastq $TMPDIR/
+cd $TMPDIR
+
+hifiasm -o ISO1_assembly -t 32 ISO1.filt.10x.fastq > ISO1_assembly.log 2>&1
+
+cp -r * /data/homezvol1/rsims1/ISO1_hifiasm_output/
+
+## Run hifiasm as sbatch job in slurm
+
+sbatch BS_hifiasm_job.slurm
+Check SLURM Job
+$seff 43191002
+
+## Convert ISO1_assembly.bp.p_ctg.gfa from .gfa to .fasta file
+
+awk '/^S/{print ">"$2"\n"$3}' ISO1_assembly.bp.p_ctg.gfa > ISO1_assembly.bp.p_ctg.fa
+ISO1_assembly.bp.p_ctg.fa
+
+module load samtools
+
+## Convert to fai (FASTA index file) using samtools
+
+samtools faidx ISO1_assembly.bp.p_ctg.fa
+
+##Obtain assembly stats from resulting ISO1_assembly.bp.p_ctg.fa.fai file
+
+## Count bases 
+awk '{sum += $2} END {print "Total bases:", sum}' ISO1_assembly.bp.p_ctg.fa.fai 
+Total bases: 128810372
+
+## Count contigs 
+awk 'END {print "Number of contigs:", NR}' ISO1_assembly.bp.p_ctg.fa.fai 
+Number of contigs: 411
+
+##Longest contig 
+awk 'max<$2 {max=$2} END {print "Longest contig:", max}' ISO1_assembly.bp.p_ctg.fa.fai
+Longest contig: 5237741
+
+
+## Calculate N50 of assembly
+awk '{
+    len[NR]=$2; total+=$2
+} END {
+    asort(len)
+    half=total/2; sum=0
+    for (i=NR; i>0; i--) {
+        sum+=len[i]
+        if (sum>=half) {
+            print "N50:", len[i]
+            break
+        }
+    }
+}' ISO1_assembly.bp.p_ctg.fa.fai
+N50: 1248665
+
+## Contiguity Plot
+
+#!/bin/bash set -euo pipefail
+mkdir -p tmp output/figures
+cut -f2 r6_ISO1_MT.fna.bgz.fai
+| sort -rn
+| awk 'BEGIN { print "Assembly\tLength\nFB_Scaff\t0" } { print "FB_Scaff\t" $1 }' \
+tmp/r6scaff.txt
+zcat r6_ISO1_MT.fna.bgz
+| faSplitByN /dev/stdin /dev/stdout 10
+| bioawk -c fastx '{ print length($seq) }'
+| sort -rn
+| awk 'BEGIN { print "Assembly\tLength\nFB_Ctg\t0" } { print "FB_Ctg\t" $1 }' \
+tmp/r6ctg.txt
+cut -f2 ISO1_assembly.bp.p_ctg.fa.fai
+| sort -rn
+| awk 'BEGIN { print "Assembly\tLength\nBS_ISO1_Ctg\t0" } { print "BS_ISO1_Ctg\t" $1 }' \
+tmp/BS_ISO1ctg.txt
+
+## Rename (optional)
+mv CDF.png BS_ISO1_vs_r6_ISO1_MT.png
+
+## Run BUSCO comparison ISO1_assembly vs diptera_odb10
+
+conda install bioconda::busco 
+busco -i ISO1_assembly.bp.p_ctg.fa -l diptera_odb10 -o busco_out -m genome
+
+## Locate Output
+cd /data/homezvol1/rsims1/ISO1_hifiasm_output/busco_out
+$ls logs run_diptera_odb10
+
+##Obtain run statistics from short_summary.txt
+cat short_summary.txt
+***** Results: *****
+C:89.6%[S:89.2%,D:0.4%],F:0.2%,M:10 3%,n:3285,E:11.0%
+2942 Complete BUSCOs (C)
+(of which 323 contain internal stop codons)
+2930 Complete and single-copy BUSCOs (S)
+12 Complete and duplicated BUSCOs (D)
+5 Fragmented BUSCOs (F)
+338 Missing BUSCOs (M)
+3285 Total BUSCO groups searched
+Assembly Statistics:
+411 Number of scaffolds
+411 Number of contigs
+128810372 Total Base length
+0.000% Percent gaps
+1 Mbp Scaffold N50
+1 Mbp Contigs N50
+
+
+## Move short_summary.txt and full_table.tsv to RStudio For plot generation
+
+## Repeat BUSCO with r6-ISO1_MT assembly vs diptera_odb10
+
+busco -i ISO1_MT.fna.bgz -l diptera_odb10 -o busco_out_1 -m genome
+
+
+## Designate unique output “Busco_out1”
+## Assign unique identifiers to corresponding short_summary.txt and full_table.tsv files
+
+mv short_summary.txt short_summary1.txt
+mv full_table.tsv full_table1.tsv
+
+cat short_summary1.tsv
+***** Results: *****
+C:99.9%[S:99.7%,D:0.3%],F:0.0%,M:0.1%,n:3285,E:10.7%
+3283 Complete BUSCOs (C) (of which 351 contain internal stop codons)
+3274 Complete and single-copy BUSCOs (S)
+9 Complete and duplicated BUSCOs (D)
+0 Fragmented BUSCOs (F)
+2 Missing BUSCOs (M)
+3285 Total BUSCO groups searched
+Assembly Statistics:
+1870 Number of scaffolds
+2442 Number of contigs
+143726002 Total length
+0.802% Percent gaps
+25 Mbp Scaffold N50
+21 Mbp Contigs N50
+
+
+
+## In R Studio
+##Begin new project for BUSCO plot
+##Load necessary BUSCO output statistics files
+##For ISO1_assembly vs diptera_odb_10: short_summary.txt, full_table.tsv
+##For r6_ISO1_MT vs diptera_odb_10:short_summary1.txt, full_table1.tsv
+
+Load necessary libraries
+
+library(dplyr)
+
+
+library(ggplot2)
+
+library(tidyr)
+
+### Function to parse BUSCO short_summary file
+
+parse_busco_summary <- function(file) {
+  lines <- readLines(file)
+
+
+
+  
+### Find the summary line (starts with "C:")
+
+  summary_line <- lines[grepl("^\\s*C:", lines)]
+  
+  if (length(summary_line) == 0) stop("No summary line found in ", file)
+  
+### Extract percentages using regex
+
+
+  complete <- as.numeric(str_match(summary_line, "C:([0-9.]+)%")[,2])
+
+  single   <- as.numeric(str_match(summary_line, "S:([0-9.]+)%")[,2])
+
+  duplicated <- as.numeric(str_match
+  (summary_line, "D:([0-9.]+)%")[,2])
+
+  fragmented <- as.numeric(str_match(summary_line, "F:([0-9.]+)%")[,2])
+
+  missing <- as.numeric(str_match(summary_line, "M:([0-9.]+)%")[,2])
+  
+  tibble(
+    Assembly = basename(file),
+    Category = c("Complete", "Duplicated", "Fragmented", "Missing"),
+    Percent = c(complete, duplicated, fragmented, missing)
+  )
+}
+
+### Apply to the two summaries
+### Replace with actual filenames
+
+file.rename(from = "short_summary.txt", to = "BS_ISO1_assembly.txt")
+
+file.rename(from = "short_summary1.txt", to = "r6_ISO1_MT_assembly.txt")
+
+df1 <- parse_busco_summary("BS_ISO1_assembly.txt")
+
+df2 <- parse_busco_summar("r6_ISO1_MT_assembly.txt")
+
+busco_df <- bind_rows(df1, df2)
+
+### Plot stacked bar chart
+
+ggplot(busco_df, aes(x = Assembly, y = Percent, fill = Category)) +
+  
+  geom_bar(stat = "identity", position = "stack") +
+
+  labs(
+    title = "BUSCO Assembly Comparison:BS_ISO1 vs r6_ISO1_MT",
+
+    x = "Assembly: Diptera odb10 ref",
+    y = "Percentage of BUSCOs"
+  )
+   +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal()
+
+
+
+
+
+
+
+
+
+
