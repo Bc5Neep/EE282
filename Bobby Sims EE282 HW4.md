@@ -214,7 +214,7 @@ EOF
 
 ```makeblastdb -in SMRTbell_adapters.fasta -dbtype nucl -out adapters```
 
-Run hifiasm
+Run hifiadapterfilt
 
 ```
 bash /data/homezvol1/rsims1/miniforge3/envs/ee282/bin/hifiadapterfilt.sh \
@@ -653,6 +653,7 @@ ggplot(busco_df, aes(x = Assembly, y = Percent, fill = Category)) +
   theme_minimal()
   ```
 ![BUSCO Comparison](<../Bobby EE282 HW#4 Materials/HW#4 plots/BS_ISO1 vs r6_ISO1_MT.png>)
+
 
 
 
