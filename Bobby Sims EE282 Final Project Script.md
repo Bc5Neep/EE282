@@ -747,8 +747,7 @@ ggplot(res_TregEAE_Sp_vs_TregN_Sp, aes(x = AveExpr, y = logFC)) +
 
 ### Filtered data for the top 10 genes
 
-```highlight <- res_TregEAE_CNS_vs_TregN_Sp[res_TregEAE_CNS_vs_TregN_Sp$Gene.Symbol %in% top10_genes_2, ]
-```
+```highlight <- res_TregEAE_CNS_vs_TregN_Sp[res_TregEAE_CNS_vs_TregN_Sp$Gene.Symbol %in% top10_genes_2,]```
 
 ### MA plot
 
