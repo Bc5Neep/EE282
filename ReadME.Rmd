@@ -50,7 +50,7 @@ Group variances are visualized
 of all 45101 genes across 6 T cell phenotypes, Naïve (control) and EAE (disease)
 
 GSEA
-•	How dose differential gene expression among observed groups align with canonical functional expression pathway?
+•	How does differential gene expression among observed groups align with canonical functional expression pathway?
 •	Groups used (only 2 contrasts from study)
          Tregs: CNS EAE (Disease focal point) vs Spleen (Naïve, Healthy)
           vs Murine Inflammatory Response Pathway 
