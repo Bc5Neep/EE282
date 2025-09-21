@@ -87,11 +87,11 @@ EOF
 ### Run command to obtain plot
 ```./Seqlength100kb_and_below.sh```
 
-![Sequences 100kb or less](<../Bobby EE282 HW#4 Materials/HW#4 plots/seqlength 100kb or less.png>)
+![Sequences 100kb or less](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/seqlength%20100kb%20or%20less.png)
 
 ## Repeat for sequences greater than 100kb
 
-![Sequences above 100kb](<../Bobby EE282 HW#4 Materials/HW#4 plots/Seqlength_above100kb.png>)
+![Sequences above 100kb](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/Seqlength_above100kb.png)
 
 
 ### Obtain %GC of Sequences less than or equal to 100kb
@@ -117,11 +117,11 @@ bin(x) = binwidth *floor((x-1)/binwidth) +1
 plot "seqGC_100kb_and_below.txt" using (bin($1)):(1) smooth freq with boxes lc rgb "blue" notitle
 EOF
 ```
-![%GC Sequences 100kb or less](<../Bobby EE282 HW#4 Materials/HW#4 plots/GC content 100kb or less.png>)
+![%GC Sequences 100kb or less](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/GC%20content%20100kb%20or%20less.png)
 
 ### Repeat for sequences greater than 100kb
 
-![%GC Sequences above 100kb](<../Bobby EE282 HW#4 Materials/HW#4 plots/GC content above 100kb.png>)
+![%GC Sequences above 100kb](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/GC%20content%20above%20100kb.png)
 
 ### Obtain cumulative size from largest to smallest for sequences ≤ 100kb and >100kb respectively, and store each in renamed.txt file
 
@@ -159,11 +159,11 @@ EOF
 ### Run command to obtain plot 
 ```./Cdf_plot100kb_and_below.sh```
 
-![CDF of Sequences 100kb or less](<../Bobby EE282 HW#4 Materials/HW#4 plots/CDF100kb_or_Less.png>)
+![CDF of Sequences 100kb or less](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/CDF100kb_or_Less.png)
 
 ### Repeat for sequences greater than 100kb
 
-![CDF of Sequences 100kb and above](<../Bobby EE282 HW#4 Materials/HW#4 plots/CDF100kb_and_Above.png>)
+![CDF of Sequences 100kb and above](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/CDF100kb_and_Above.png)
 
 
 ## Sequence assembly
@@ -415,7 +415,6 @@ Compare fidelity of assemblies
 2) r6_ISO1_MT Contigs
 3) ISO1_assembly Contigs
 ```
-```
 #!/bin/bash
 set -euo pipefail
 
@@ -437,6 +436,7 @@ cut -f2 ISO1_assembly.bp.p_ctg.fa.fai \
   | sort -rn \
   | awk 'BEGIN { print "Assembly\tLength\nBS_ISO1_Ctg\t0" } { print "BS_ISO1_Ctg\t" $1 }' \
   > tmp/BS_ISO1ctg.txt
+  ```
 
 ### Obtain CDF Contiguity plot
 
@@ -446,7 +446,8 @@ Rename (optional)
 
 ```mv CDF.png BS_ISO1_vs_r6_ISO1_MT.png```
 
-![Contiguity plot](<../Bobby EE282 HW#4 Materials/HW#4 plots/BS_ISO1_vs_r6_ISO1_MT.png>)
+![Contiguity plot](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/CDF100kb_and_Above.png)
+
 ------
 
 ## BUSCO 
@@ -652,7 +653,7 @@ ggplot(busco_df, aes(x = Assembly, y = Percent, fill = Category)) +
   scale_fill_brewer(palette = "Set2") +
   theme_minimal()
   ```
-![BUSCO Comparison](<../Bobby EE282 HW#4 Materials/HW#4 plots/BS_ISO1 vs r6_ISO1_MT.png>)
+![BUSCO Comparison](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/BS_ISO1%20vs%20r6_ISO1_MT.png)
 
 
 
