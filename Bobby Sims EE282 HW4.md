@@ -446,7 +446,7 @@ Rename (optional)
 
 ```mv CDF.png BS_ISO1_vs_r6_ISO1_MT.png```
 
-![Contiguity plot](https://github.com/Bc5Neep/EE282/blob/HW4/HW%234%20plots/CDF100kb_and_Above.png)
+![Contiguity plot](https://github.com/Bc5Neep/EE282/blob/Homework-4/HW%234%20plots/CDF.png)
 
 ------
 
